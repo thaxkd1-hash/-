@@ -7,13 +7,31 @@ import { cn } from '../lib/utils';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navLinks = [
-    { name: 'Works', path: '/works' },
-    { name: 'About', path: '/about' },
-    { name: 'Skills', path: '/skills' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'Works', path: '#works' },
+    { name: 'About', path: '#about' },
+    { name: 'Skills', path: '#skills' },
+    { name: 'Contact', path: '#contact' },
   ];
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (path.startsWith('#')) {
+      e.preventDefault();
+      const id = path.substring(1);
+      
+      if (location.pathname === '/') {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        navigate(`/${path}`);
+      }
+      setIsOpen(false);
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 glass border-b border-white/5">
@@ -25,16 +43,17 @@ export default function Navbar() {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link
+            <a
               key={link.name}
-              to={link.path}
+              href={link.path}
+              onClick={(e) => handleNavClick(e, link.path)}
               className={cn(
                 "text-sm font-medium tracking-widest uppercase transition-colors hover:text-accent",
-                location.pathname === link.path ? "text-accent" : "text-white/70"
+                location.hash === link.path ? "text-accent" : "text-white/70"
               )}
             >
               {link.name}
-            </Link>
+            </a>
           ))}
           <Link
             to="/admin"
@@ -63,17 +82,17 @@ export default function Navbar() {
             className="md:hidden absolute top-20 left-0 w-full bg-bg border-b border-white/5 p-6 flex flex-col gap-4"
           >
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.name}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
+                href={link.path}
+                onClick={(e) => handleNavClick(e, link.path)}
                 className={cn(
                   "text-lg font-medium tracking-widest uppercase hover:text-accent transition-colors",
-                  location.pathname === link.path ? "text-accent" : "text-white/70"
+                  location.hash === link.path ? "text-accent" : "text-white/70"
                 )}
               >
                 {link.name}
-              </Link>
+              </a>
             ))}
           </motion.div>
         )}
