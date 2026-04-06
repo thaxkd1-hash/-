@@ -29,9 +29,14 @@ export default class ErrorBoundary extends Component<Props, State> {
       
       try {
         // Check if it's a Firestore error JSON
-        const firestoreError = JSON.parse(this.state.error?.message || '');
-        if (firestoreError.error) {
-          errorMessage = `Firestore Error: ${firestoreError.error} during ${firestoreError.operationType} on ${firestoreError.path}`;
+        const message = this.state.error?.message || '';
+        if (message.startsWith('{')) {
+          const firestoreError = JSON.parse(message);
+          if (firestoreError.error) {
+            errorMessage = `Firestore Error: ${firestoreError.error} during ${firestoreError.operationType} on ${firestoreError.path}`;
+          }
+        } else {
+          errorMessage = message || errorMessage;
         }
       } catch (e) {
         // Not a JSON error, use default or error message
